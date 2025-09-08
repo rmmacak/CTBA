@@ -1,0 +1,42 @@
+import requests
+from bs4 import BeautifulSoup
+
+# URL of the TripAdvisor Williamsburg attractions page
+url = 'https://www.tripadvisor.com/Attractions-g58313-Activities-Williamsburg_Virginia.html'
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+}
+
+req = requests.get(url, headers=headers)
+
+# Parse the HTML content
+soup = BeautifulSoup(req.text, 'lxml')
+
+# Find attraction containers
+attractions = soup.find_all('div', {'class': 'attraction_element'})
+
+# Loop through and print attraction details
+for attraction in attractions:
+    title = attraction.find('div', {'class': 'listing_title'})
+    if title and title.a:
+        title_text = title.a.get_text(strip=True)
+    else:
+        title_text = 'No title found'
+
+    rating = attraction.find('span', {'class': 'ui_bubble_rating'})
+    if rating:
+        rating_classes = rating.get('class')
+        # Extract rating number from class name like 'bubble_45' → 4.5
+        rating_num = None
+        for cls in rating_classes:
+            if 'bubble_' in cls:
+                rating_num = int(cls.split('_')[1]) / 10
+                break
+    else:
+        rating_num = 'No rating found'
+
+    print(f"Title: {title_text}")
+    print(f"Rating: {rating_num}")
+    print('-' * 40)
