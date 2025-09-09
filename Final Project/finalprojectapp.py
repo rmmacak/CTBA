@@ -4,18 +4,32 @@ import dash_bootstrap_components as dbc
 
 
 #initialize the app
-app = Dash(__name__, use_pages=True, suppress_callback_exceptions=True, title = "Multi-Page-App")
+app = Dash(__name__, use_pages=True, suppress_callback_exceptions=True, title = "Colonial Williamsburg Travel Guide", external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server #for deployment
 
+# Add custom CSS
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <link rel="stylesheet" href="/assets/style.css">
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
 
 app.layout = html.Div([
-    dbc.NavbarSimple(
-        children = [
-            dbc.NavLink("Hotels", href = "/", active = "exact"),
-            dbc.NavLink("Activities", href = "/page1", active = "exact"),
-            dbc.NavLink("Restaurants", href = "/page2", active = "exact")
-        ],
-    brand = "Multi-Page App"),
     dash.page_container
 ])
 
