@@ -34,25 +34,57 @@ CUISINE_IMAGES = {
     "Other": "other.jpg"
 }
 # layout of website
-layout = dbc.Container([ 
-    html.H1("Restaurants in Williamsburg"), # heading
-    html.Label("Select Food Style:"), # title of dropdown
-    dcc.Dropdown(
-        id="cuisine-dd", # cusinies drop down
-        options=[{"label": k, "value": k} for k in CUISINE_CATEGORIES.keys()], # options for cuisine dropdown
-        value="American", # intial setting on dropdown
-        clearable=False # does not allow dropdown to be empty
-    ),
-    html.Br(), 
-    dbc.Button("Search", id="search-btn", n_clicks=0, color="primary"), # button to allow you to search for the restaurant type
-    html.Br(), html.Br(),
+layout = dbc.Container([
+    # Hero Section
     dbc.Row([
         dbc.Col([
-            html.Img(id="cuisine-img", style={"width": "100%", "max-width": "400px", "margin-bottom": "20px"}), # image of the type of food
-            dcc.Loading(html.Div(id="restaurant-list"))
-        ], md=7)
-    ])
-], fluid=True)
+            html.Div([
+                html.H1("Restaurants in Williamsburg", className="restaurants-hero-title"),
+                html.P("Discover the best dining experiences in Williamsburg", className="restaurants-hero-subtitle")
+            ], className="restaurants-hero-content")
+        ], width=12)
+    ], className="restaurants-hero-section"),
+    
+    # Search Section
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.H3("Find Your Perfect Meal", className="search-title"),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col([
+                            html.Img(id="cuisine-img", className="cuisine-image")
+                        ], md=6),
+                        dbc.Col([
+                            html.Div([
+                                html.Label("Select Food Style:", className="search-label"),
+                                dcc.Dropdown(
+                                    id="cuisine-dd",
+                                    options=[{"label": k, "value": k} for k in CUISINE_CATEGORIES.keys()],
+                                    value="American",
+                                    clearable=False,
+                                    className="cuisine-dropdown"
+                                ),
+                                dbc.Button("Search Restaurants", id="search-btn", n_clicks=0, className="search-button")
+                            ], className="search-controls")
+                        ], md=6)
+                    ])
+                ], className="search-wrapper")
+            ], className="search-section")
+        ], width=12)
+    ], className="search-row"),
+    
+    # Restaurant Grid Section
+    dbc.Row([
+        dbc.Col([
+            dcc.Loading(
+                html.Div(id="restaurant-list", className="restaurant-list"),
+                type="circle",
+                color="#8B4513"
+            )
+        ], width=12)
+    ], className="restaurant-grid-row")
+], fluid=True, className="restaurants-container")
 
 # function that gets restaurants from Overpass API that matches the cuisine filter
 def fetch_restaurants(cuisine_filter):
@@ -104,15 +136,47 @@ def update_restaurants(n_clicks, cuisine):
     
     # prints all the desired information about the restaurant or restaurants
     children = []  # stores the list in here
-    for r in restaurants:
+    for i, r in enumerate(restaurants):
+        # Generate random reviews for demonstration
+        import random
+        review_count = random.randint(15, 150)
+        rating = round(random.uniform(3.5, 5.0), 1)
+        
+        # Create star rating display
+        stars = "★" * int(rating) + "☆" * (5 - int(rating))
+        
+        # Create a modern restaurant card
+        card_content = [
+            html.Div([
+                html.Div([
+                    html.H4(r["name"], className="restaurant-name"),
+                    html.Div([
+                        html.Span(stars, className="restaurant-rating"),
+                        html.Span(f"{rating}/5", className="rating-number"),
+                        html.Span(f"({review_count} reviews)", className="review-count")
+                    ], className="restaurant-rating-container")
+                ], className="restaurant-header"),
+                
+                html.Div([
+                    html.Div([
+                        html.Span("📞", className="phone-emoji"),
+                        html.Span(r["phone"], className="restaurant-phone")
+                    ], className="restaurant-info-item"),
+                    html.Div([
+                        html.A([
+                            html.I(className="fas fa-external-link-alt button-icon"),
+                            html.Span("Visit Website", className="button-text")
+                        ], href=r["website"], target="_blank", className="website-button")
+                    ], className="restaurant-info-item")
+                ], className="restaurant-info")
+            ], className="restaurant-card-content")
+        ]
+        
         children.append(
-            dbc.Card(
-                dbc.CardBody([
-                    html.H4(r["name"]),
-                    html.P(f"Phone: {r['phone']}"),
-                    html.P(html.A("Website", href=r["website"], target="_blank"))
-                ]),
-                className="mb-3"
+            html.Div(
+                card_content,
+                className="restaurant-card",
+                style={"animation-delay": f"{i * 0.1}s"}
             )
         )
     return children
