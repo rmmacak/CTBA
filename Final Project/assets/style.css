@@ -1,0 +1,98 @@
+
+body {
+    background-color: #f8f8f8 !important;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20 px;
+}
+
+h2{
+    color: #023d58;
+    font-size: 40px;
+    align-items: center;
+    text-align: center;
+
+}
+p{
+    font-size: 25px;
+    text-decoration: solid;
+    line-height: 1.4;
+    color: red;
+    align-items: center;
+    text-align: center;
+}
+
+a {
+    display:inline-block;
+    margin:25px;
+    text-decoration:none;
+    border: 2px solid #ffffff;
+    border-radius:10px;
+    padding: 10px 20px;
+    background-color: #2c3e50;
+    color: #ffffff;
+    align-items: center;
+    text-align: center;
+}
+
+a:hover{
+    text-decoration: underline;
+    background-color: #4e949a;
+}
+
+/*Weather styles for blocking elements */
+.weather-grid{
+    display:flex;
+    flex-direction: column;
+    padding: 12px;
+    gap:12px;
+}
+
+.row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.block{
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    background-color: #F5F7Fa;
+    color: #334155;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.block-top{
+    min-height: 150px;
+}
+
+.block-footer{
+    min-height: 80px;
+}
+
+@media (max-width:768px){
+    .row-2{grid-template-columns: 1fr;}
+}
+
+/* Attractions*/
+.attractions-wrap{
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.attractions-title{
+    font-size: 28px;
+    color: #415878;
+    margin-top: 6px;
+}
+
+.attractions-subtitle{
+    color: #020303;
+    margin-top: 30px;
+    align-items: center;
+    text-align: center;
+}
