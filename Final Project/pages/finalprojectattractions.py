@@ -20,17 +20,18 @@ layout = html.Div([
 
 # Fallback list
 FALLBACK_ATTRACTIONS = [
-    "Colonial Williamsburg (Governor's Palace, trades, reenactments)",
-    "DeWitt Wallace Decorative Arts Museum",
-    "Abby Aldrich Rockefeller Folk Art Museum",
-    "Muscarelle Museum of Art",
-    "Busch Gardens Williamsburg",
-    "Water Country USA",
-    "Jamestown Settlement",
-    "American Revolution Museum at Yorktown",
-    "Kimball Theatre",
-    "Merchants Square"
+    {"name": "Colonial Williamsburg (Governor's Palace, trades, reenactments)", "rating": 89},
+    {"name": "DeWitt Wallace Decorative Arts Museum", "rating": 80},
+    {"name": "Abby Aldrich Rockefeller Folk Art Museum", "rating": 90},
+    {"name": "Muscarelle Museum of Art", "rating": 90},
+    {"name": "Busch Gardens Williamsburg", "rating": 94},
+    {"name": "Water Country USA", "rating": 94},
+    {"name": "Jamestown Settlement", "rating": 91},
+    {"name": "American Revolution Museum at Yorktown", "rating": 50},
+    {"name": "Kimball Theatre", "rating": 92},
+    {"name": "Merchants Square", "rating": 88}
 ]
+
 
 ATTRACTIONS_IMAGES = {
     "Colonial Williamsburg (Governor's Palace, trades, reenactments)": "colonials williamsburg.jpg",
@@ -85,3 +86,4 @@ def update_attraction(n_clicks):
         image_path = ""
 
     return html.Div(text, className="attraction-result"), image_path
+
