@@ -1,0 +1,87 @@
+import requests
+from bs4 import BeautifulSoup
+
+# URL of the TripAdvisor Williamsburg attractions page
+url = 'https://www.tripadvisor.com/Attractions-g58313-Activities-Williamsburg_Virginia.html'
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+}
+
+req = requests.get(url, headers=headers)
+soup = BeautifulSoup(req.text, 'lxml')
+
+attractions = soup.find_all('div', {'class': 'attraction_element'})
+
+# Collect HTML blocks
+cards = []
+
+for attraction in attractions:
+    title = attraction.find('div', {'class': 'listing_title'})
+    if title and title.a:
+        title_text = title.a.get_text(strip=True)
+    else:
+        title_text = 'No title found'
+
+    rating = attraction.find('span', {'class': 'ui_bubble_rating'})
+    if rating:
+        rating_classes = rating.get('class')
+        rating_num = None
+        for cls in rating_classes:
+            if 'bubble_' in cls:
+                rating_num = int(cls.split('_')[1]) / 10
+                break
+    else:
+        rating_num = 'No rating found'
+
+    cards.append(f"""
+        <div class="card">
+            <h2>{title_text}</h2>
+            <p>Rating: {rating_num}</p>
+        </div>
+    """)
+
+# Build HTML page
+html_page = f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Williamsburg Attractions</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 2rem;
+        }}
+        h1 {{
+            text-align: center;
+            color: #333;
+        }}
+        .card {{
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        .card h2 {{
+            margin-top: 0;
+            color: #007b8a;
+        }}
+        .card p {{
+            font-size: 1.1rem;
+            color: #555;
+        }}
+    </style>
+</head>
+<body>
+    <h1>Top Attractions in Williamsburg, VA</h1>
+    {''.join(cards)}
+</body>
+</html>
+"""
+with open("attractions.html", "w", encoding="utf-8") as file:
+    file.write(html_page)
