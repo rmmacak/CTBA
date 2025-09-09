@@ -2,21 +2,36 @@ from dash import html, register_page, dcc, callback, Output, Input
 import requests
 from bs4 import BeautifulSoup
 import random
+import dash_bootstrap_components as dbc
 
 register_page(__name__, path="/attractions", name="Attractions")
 
-layout = html.Div([
-    html.H2("Attractions", className="page-title"),
-    html.P("Click the button and see where you go today!", className="page-subtitle"),
-    html.Button("Attraction Button", id="btn-attraction", n_clicks=0),
-    dcc.Loading(html.Div(id="attraction-site")),
-    html.Img(id="attractions-img", style={
-        "width": "100%",
-        "max-width": "600px",
-        "margin-bottom": "20px",
-        "align-items": "center"
-    }),
-], className="attractions-wrap")
+layout = dbc.Container([
+    # Hero Section
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.H1("Discover Williamsburg", className="attractions-hero-title"),
+                html.P("Explore the best attractions and experiences in Williamsburg", className="attractions-hero-subtitle"),
+                dbc.Button([
+                    html.I(className="fas fa-dice me-2"),
+                    "Find My Adventure"
+                ], id="btn-attraction", n_clicks=0, className="attractions-discover-btn")
+            ], className="attractions-hero-content")
+        ], width=12)
+    ], className="attractions-hero-section"),
+    
+    # Main Content
+    dbc.Row([
+        dbc.Col([
+            dcc.Loading(
+                html.Div(id="attraction-site", className="attraction-result-container"),
+                type="circle",
+                color="#8B4513"
+            )
+        ], width=12)
+    ], className="attractions-main-content")
+], fluid=True, className="attractions-container")
 
 # Fallback list
 FALLBACK_ATTRACTIONS = [
@@ -67,23 +82,70 @@ def fetch_attractions():
 # ✅ COMBINED callback for name and image
 @callback(
     Output("attraction-site", "children"),
-    Output("attractions-img", "src"),
     Input("btn-attraction", "n_clicks")
 )
 def update_attraction(n_clicks):
     if not n_clicks:
-        return "", ""
+        return html.Div([
+            html.Div([
+                html.I(className="fas fa-map-marker-alt attractions-placeholder-icon"),
+                html.H3("Ready to Explore?", className="attractions-placeholder-title"),
+                html.P("Click the button above to discover your next adventure in Williamsburg!", className="attractions-placeholder-text")
+            ], className="attractions-placeholder")
+        ], className="attraction-result-container")
 
     attractions = fetch_attractions()
     selected = random.choice(attractions)
-
-    text = f"🎡 Your attraction: {selected}"
-    image_file = ATTRACTIONS_IMAGES.get(selected)
-
-    if image_file:
-        image_path = f"/assets/{image_file}"
+    
+    # Handle both dict and string formats
+    if isinstance(selected, dict):
+        attraction_name = selected["name"]
+        attraction_rating = selected.get("rating", 0)
     else:
-        image_path = ""
+        attraction_name = selected
+        attraction_rating = 0
 
-    return html.Div(text, className="attraction-result"), image_path
+    # Get image file
+    image_file = ATTRACTIONS_IMAGES.get(attraction_name, "other.jpg")
+    image_path = f"/assets/{image_file}"
+    
+    # Create star rating
+    stars = "★" * (attraction_rating // 20) + "☆" * (5 - (attraction_rating // 20))
+    
+    # Create image section - show fallback if no image file
+    if image_file == "other.jpg" or not image_file:
+        image_section = html.Div([
+            html.I(className="fas fa-image attraction-fallback-icon"),
+            html.Span("Image not available", className="attraction-fallback-text")
+        ], className="attraction-image-fallback")
+    else:
+        image_section = html.Img(src=image_path, className="attraction-image")
+    
+    # Create modern attraction card
+    attraction_card = html.Div([
+        html.Div([
+            html.Div([
+                image_section
+            ], className="attraction-image-container"),
+            html.Div([
+                html.Div([
+                    html.H2(attraction_name, className="attraction-name"),
+                    html.Div([
+                        html.Span(stars, className="attraction-rating"),
+                        html.Span(f"{attraction_rating}/100", className="attraction-rating-number")
+                    ], className="attraction-rating-container")
+                ], className="attraction-header"),
+                html.Div([
+                    html.I(className="fas fa-map-marker-alt attraction-icon"),
+                    html.Span("Williamsburg, VA", className="attraction-location")
+                ], className="attraction-location-container"),
+                html.Div([
+                    html.I(className="fas fa-star attraction-icon"),
+                    html.Span("Highly Recommended", className="attraction-recommendation")
+                ], className="attraction-recommendation-container")
+            ], className="attraction-content")
+        ], className="attraction-card")
+    ], className="attraction-result")
+
+    return attraction_card
 
