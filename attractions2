@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-# URL of the TripAdvisor Williamsburg attractions page
+##URL of the TripAdvisor Williamsburg attractions page
 url = 'https://www.tripadvisor.com/Attractions-g58313-Activities-Williamsburg_Virginia.html'
 
 headers = {
@@ -9,14 +9,19 @@ headers = {
                   "(KHTML, like Gecko) Chrome/115.0 Safari/537.36"
 }
 
+##HTTP request
 req = requests.get(url, headers=headers)
+
+##Use BeautifulSoup to parse the HTML content
 soup = BeautifulSoup(req.text, 'lxml')
 
+##Find all attractions on the page
 attractions = soup.find_all('div', {'class': 'attraction_element'})
 
-# Collect HTML blocks
+##storing attraction as an HTML "card"
 cards = []
 
+##Loop through each attraction
 for attraction in attractions:
     title = attraction.find('div', {'class': 'listing_title'})
     if title and title.a:
@@ -35,6 +40,7 @@ for attraction in attractions:
     else:
         rating_num = 'No rating found'
 
+    # Add the HTML for this card to the list
     cards.append(f"""
         <div class="card">
             <h2>{title_text}</h2>
@@ -42,7 +48,7 @@ for attraction in attractions:
         </div>
     """)
 
-# Build HTML page
+# Combine the cards into a full HTML page
 html_page = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -52,28 +58,29 @@ html_page = f"""
     <style>
         body {{
             font-family: Arial, sans-serif;
-            background: #f9f9f9;
-            margin: 0;
-            padding: 2rem;
+            background-color: #f0f0f0;
+            padding: 20px;
         }}
         h1 {{
             text-align: center;
             color: #333;
         }}
         .card {{
-            background: white;
+            background-color: white;
+            padding: 15px;
+            margin: 10px auto;
+            max-width: 600px;
             border-radius: 8px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }}
         .card h2 {{
             margin-top: 0;
             color: #007b8a;
         }}
         .card p {{
-            font-size: 1.1rem;
-            color: #555;
+            margin: 0;
+            font-size: 1.1em;
+            color: #444;
         }}
     </style>
 </head>
@@ -83,5 +90,10 @@ html_page = f"""
 </body>
 </html>
 """
+
+# Save the HTML page to a file
 with open("attractions.html", "w", encoding="utf-8") as file:
     file.write(html_page)
+
+print("HTML page saved as 'attractions.html'. Open it in your browser to view it.")
+
